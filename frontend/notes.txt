@@ -1,0 +1,328 @@
+dashboard.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAWASA Water Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    canvas {
+      max-height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <h2 class="mb-4 text-center">BAWASA Water Monitoring Dashboard</h2>
+
+    <div class="row g-4">
+      <!-- Line Chart -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5 class="card-title text-center">Monthly Water Consumption</h5>
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Bar Chart -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5 class="card-title text-center">Top 10 Consumers</h5>
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Pie Chart -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5 class="card-title text-center">Consumption Range Distribution</h5>
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5 class="card-title text-center">Top vs Bottom Consumer Patterns</h5>
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fetchData = async (url) => {
+      const response = await fetch(url);
+      return response.json();
+    };
+
+    async function renderCharts() {
+      const monthly = await fetchData('http://localhost:3000/api/water-usages/monthly');
+      const top = await fetchData('http://localhost:3000/api/water-usages/top-consumers');
+      const low = await fetchData('http://localhost:3000/api/water-usages/low-consumers');
+
+      // Line Chart: Monthly Consumption
+      new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+          labels: monthly.map(d => d.month),
+          datasets: [{
+            label: 'Total Consumption (m³)',
+            data: monthly.map(d => d.total_consumption),
+            fill: false,
+            borderColor: '#0d6efd',
+            tension: 0.3
+          }]
+        }
+      });
+
+      // Bar Chart: Top Consumers
+      new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+          labels: top.map(d => d.name),
+          datasets: [{
+            label: 'Consumption (m³)',
+            data: top.map(d => d.total_consumption),
+            backgroundColor: '#198754'
+          }]
+        }
+      });
+
+      // Pie Chart: Mock Distribution (you can replace this with real endpoint)
+      new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+          labels: ['0-10m³', '11-20m³', '21-30m³'],
+          datasets: [{
+            label: 'Distribution',
+            data: [120, 230, 150],
+            backgroundColor: ['#ffc107', '#fd7e14', '#dc3545']
+          }]
+        }
+      });
+
+      // Radar Chart: Top vs Bottom Patterns
+      new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+          labels: top.map(d => d.name),
+          datasets: [
+            {
+              label: 'Top Consumers',
+              data: top.map(d => d.total_consumption),
+              borderColor: '#0dcaf0',
+              backgroundColor: 'rgba(13, 202, 240, 0.2)'
+            },
+            {
+              label: 'Low Consumers',
+              data: low.map(d => d.total_consumption),
+              borderColor: '#6f42c1',
+              backgroundColor: 'rgba(111, 66, 193, 0.2)'
+            }
+          ]
+        }
+      });
+    }
+
+    renderCharts();
+  </script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAWASA Water Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('assets/bg.gif') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      background-color: rgba(255, 255, 255, 0.7); /* light semi-transparent card */
+    }
+
+    canvas {
+      background-color: rgba(255, 255, 255, 0.5); /* semi-transparent canvas */
+      border-radius: 0.5rem;
+      padding: 1rem;
+    }
+
+    h2 {
+      color: white;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Navbar styling */
+    .navbar {
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+    }
+    .navbar-brand,
+    .nav-link {
+      color: white !important;
+    }
+    .nav-link:hover {
+      color: #ffc107 !important;
+      transition: color 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top px-4">
+    <a class="navbar-brand" href="#">BAWASA</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Contact Us</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container my-4">
+    <h2 class="mb-4 text-center">BAWASA Water Monitoring Dashboard</h2>
+
+    <div class="row g-4">
+      <!-- Line Chart -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5 class="card-title text-center">Monthly Water Consumption</h5>
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Bar Chart -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5 class="card-title text-center">Top 10 Consumers</h5>
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Pie Chart -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5 class="card-title text-center">Consumption Range Distribution</h5>
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5 class="card-title text-center">Top vs Bottom Consumer Patterns</h5>
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fetchData = async (url) => {
+      const response = await fetch(url);
+      return response.json();
+    };
+
+    async function renderCharts() {
+      const monthly = await fetchData('http://localhost:3000/api/water-usages/monthly');
+      const top = await fetchData('http://localhost:3000/api/water-usages/top-consumers');
+      const low = await fetchData('http://localhost:3000/api/water-usages/low-consumers');
+
+      // Line Chart: Monthly Consumption
+      new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+          labels: monthly.map(d => d.month),
+          datasets: [{
+            label: 'Total Consumption (m³)',
+            data: monthly.map(d => d.total_consumption),
+            fill: false,
+            borderColor: '#0d6efd',
+            tension: 0.3
+          }]
+        }
+      });
+
+      // Bar Chart: Top Consumers
+      new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+          labels: top.map(d => d.name),
+          datasets: [{
+            label: 'Consumption (m³)',
+            data: top.map(d => d.total_consumption),
+            backgroundColor: '#198754'
+          }]
+        }
+      });
+
+      // Pie Chart: Mock Distribution
+      new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+          labels: ['0-10m³', '11-20m³', '21-30m³'],
+          datasets: [{
+            label: 'Distribution',
+            data: [120, 230, 150],
+            backgroundColor: ['#ffc107', '#fd7e14', '#dc3545']
+          }]
+        }
+      });
+
+      // Radar Chart: Top vs Bottom Patterns
+      new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+          labels: top.map(d => d.name),
+          datasets: [
+            {
+              label: 'Top Consumers',
+              data: top.map(d => d.total_consumption),
+              borderColor: '#0dcaf0',
+              backgroundColor: 'rgba(13, 202, 240, 0.2)'
+            },
+            {
+              label: 'Low Consumers',
+              data: low.map(d => d.total_consumption),
+              borderColor: '#6f42c1',
+              backgroundColor: 'rgba(111, 66, 193, 0.2)'
+            }
+          ]
+        }
+      });
+    }
+
+    renderCharts();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
