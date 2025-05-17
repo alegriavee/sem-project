@@ -1,29 +1,3 @@
-No, the **API documentation is not yet included** in the `README.md` I gave you earlier — that version focused on:
-
-* Project overview
-* Dataset
-* Install instructions
-* Features
-* Dependencies
-* Authors
-
----
-
-### ✅ Good news:
-
-I can **integrate** the API documentation **directly into your README** or give you a **separate `API.md` file** — whichever you prefer.
-
----
-
-### 🔧 If you want to add it *inside the same `README.md`*, here's how we can update it:
-
-You’d add this section at the end of your README:
-
----
-
-````markdown
----
-
 ## 🌐 API Documentation
 
 The backend exposes a RESTful API using Express and MySQL. It allows access to customer records, water usage data, and billing details.
